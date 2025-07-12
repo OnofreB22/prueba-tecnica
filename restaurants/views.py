@@ -16,9 +16,15 @@ class NearbyRestaurantsView(APIView):
         api_key = settings.GOOGLE_MAPS_API_KEY
 
         # Verificar que lat/long sean validos
-        if lat and lng:
-            if not(-90 <= float(lat) <= 90) and not(-180 <= float(lat) <= 180):
-                return Response({'error': 'Coordenadas invalidas'}, status=400) 
+        try:
+            if lat is not None and lng is not None:
+                lat = float(lat)
+                lng = float(lng)
+                if not (-90 <= lat <= 90) or not (-180 <= lng <= 180):
+                    return Response({'error': 'Coordenadas inválidas'}, status=400)
+        except (ValueError, TypeError):
+            return Response({'error': 'Coordenadas inválidas'}, status=400)
+    
 
         # Si se proporciona ciudad, consular Geocoding API para obtener coordenadas
         if city:

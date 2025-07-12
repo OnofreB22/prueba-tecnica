@@ -84,3 +84,74 @@ class UserViewsTest(APITestCase):
         response = self.client.get(actions_url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_user_action_list_view_two_users(self):
+        """
+        Testea que el endpoint de acciones solo devuelve el historial del usuario autenticado,
+        incluso si hay acciones de otros usuarios en la base de datos.
+        """
+        # Crear segundo usuario
+        user2 = User.objects.create_user(
+            email='other@example.com',
+            username='otheruser',
+            password='otherpass123'
+        )
+        
+        # Contar acciones existentes
+        initial_user1_actions = UserAction.objects.filter(user=self.user).count()
+        initial_user2_actions = UserAction.objects.filter(user=user2).count()
+        
+        # Crear acciones para ambos usuarios
+        UserAction.objects.create(user=self.user, action='signup')
+        UserAction.objects.create(user=self.user, action='login')
+        UserAction.objects.create(user=user2, action='signup')
+        UserAction.objects.create(user=user2, action='logout')
+        
+        # Login como self.user
+        url = reverse('token_obtain_pair')
+        data = {'email': 'test@example.com', 'password': 'testpass123'}
+        response = self.client.post(url, data)
+        access_token = response.data['access']
+        
+        # Consultar historial de acciones como self.user
+        actions_url = reverse('user_actions')
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {access_token}')
+        response = self.client.get(actions_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        actions = response.data
+        
+        # Verificar que aparecen las acciones esperadas de self.user
+        expected_actions = ['signup', 'login']
+        returned_actions = [a['action'] for a in actions]
+        
+        # Verificar que las nuevas acciones estan presentes
+        for expected_action in expected_actions:
+            self.assertIn(expected_action, returned_actions)
+        
+        # Verificar que hay al menos 2 acciones mas que al inicio
+        self.assertGreaterEqual(len(actions), initial_user1_actions + 2)
+        
+        # Verificar que solo contiene los campos esperados
+        for action in actions:
+            self.assertIn('action', action)
+            self.assertIn('timestamp', action)
+            self.assertEqual(len(action), 2)
+        
+        # Login como user2
+        response2 = self.client.post(url, {'email': 'other@example.com', 'password': 'otherpass123'})
+        access_token2 = response2.data['access']
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {access_token2}')
+        response = self.client.get(actions_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        actions = response.data
+        
+        # Verificar que aparecen las acciones de user2
+        expected_actions_user2 = ['signup', 'logout']
+        returned_actions_user2 = [a['action'] for a in actions]
+        
+        # Verificar que las nuevas acciones estan presentes
+        for expected_action in expected_actions_user2:
+            self.assertIn(expected_action, returned_actions_user2)
+        
+        # Verificar que hay al menos 2 acciones mas que al inicio
+        self.assertGreaterEqual(len(actions), initial_user2_actions + 2)
