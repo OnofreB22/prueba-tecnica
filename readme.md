@@ -29,7 +29,7 @@ cd prueba-tecnica/
 ```
 
 ### 2. Crear .env
-Crear archivo .env siguiendo la siguiente estructura:
+Crear archivo .env siguiendo esta estructura:
 ```
 DB_HOST=
 DB_NAME=
