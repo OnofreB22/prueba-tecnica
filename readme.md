@@ -25,11 +25,11 @@
 ### 1. Clonar proyecto desde GitHub
 ```bash
 git clone https://github.com/OnofreB22/prueba-tecnica.git
-cd PruebaT
+cd prueba-tecnica/
 ```
 
 ### 2. Crear .env
-Crear archivo en prueba-tecnica/app/.env siguiendo la siguiente estructura:
+Crear archivo .env siguiendo la siguiente estructura:
 ```
 DB_HOST=
 DB_NAME=
