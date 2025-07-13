@@ -42,10 +42,12 @@ class NearbyRestaurantsView(APIView):
         # Registrar acción de busqueda de restaurantes
         UserAction.objects.create(user=request.user, action='search_restaurants')
 
+        search_rad = 2000 # Radio de busqueda
+
         # Buscar restaurantes cercanos
         places_url = (
             f"https://maps.googleapis.com/maps/api/place/nearbysearch/json"
-            f"?location={lat},{lng}&radius=2000&type=restaurant&key={api_key}"
+            f"?location={lat},{lng}&radius={search_rad}&type=restaurant&key={api_key}"
         )
         places_resp = requests.get(places_url).json()
         results = [
