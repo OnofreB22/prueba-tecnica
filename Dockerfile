@@ -7,11 +7,11 @@ RUN pip install --upgrade pip
 
 RUN apk add --no-cache postgresql-dev gcc musl-dev python3-dev
 
-COPY requirements.txt .
+COPY app/requirements.txt .
 
 RUN pip install -r requirements.txt
 
-COPY ./app .
+COPY app/ .
 
 EXPOSE 8000
 
