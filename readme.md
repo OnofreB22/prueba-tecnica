@@ -22,13 +22,13 @@
 - Docker Compose
 
 ## Instalación y configuración
-Clona el proyecto desde GitHub:
+### 1. Clonar proyecto desde GitHub
 ```bash
 git clone https://github.com/OnofreB22/prueba-tecnica.git
 cd PruebaT
 ```
 
-### 3. Crear .env
+### 2. Crear .env
 Crear archivo en prueba-tecnica/app/.env siguiendo la siguiente estructura:
 ```
 DB_HOST=
@@ -146,7 +146,7 @@ Authorization: Bearer <token_de_acceso>
 ```
 
 ### Buscar restaurantes cercanos
-- **Endpoint**: ``GET`` /restaurants/nearby/?city=nombre_ciudad
+- **Endpoint**: ``GET`` /restaurants/nearby/
 - **Headers**:
 ```http
 Authorization: Bearer <token_de_acceso>
